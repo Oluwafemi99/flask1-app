@@ -1,29 +1,9 @@
-from flask import Flask, Blueprint, render_template, redirect, url_for, flash
-from flask_login import login_user, login_required, logout_user, current_user, LoginManager
+from flask import Blueprint, render_template, redirect, url_for, flash
+from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from forms import RegisterForm, LoginForm
-from models import db, User
-from flask_wtf.csrf import CSRFProtect
-from flask_sqlalchemy import SQLAlchemy
-
-# Initialize Flask app
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
-
-# Initialize extensions with the app
-db.init_app(app)
-login_manager = LoginManager()
-login_manager.init_app(app)
-csrf = CSRFProtect()
-csrf.init_app(app)
-
-# Create database tables within application context
-with app.app_context():
-    db.create_all()
-
-# Set the login view for the login manager
-login_manager.login_view = 'auth.login' # type: ignore
+from .forms import RegisterForm, LoginForm
+from .models import User
+from . import db, login_manager
 
 # Create a Blueprint for the authentication routes
 auth = Blueprint('auth', __name__)
@@ -32,6 +12,7 @@ auth = Blueprint('auth', __name__)
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
 
 
 # Renders the homepage
@@ -49,10 +30,12 @@ def register():
             return render_template('register.html', form=form)
         hashed_pw = generate_password_hash(form.password.data)
         new_user = User(username=form.username.data, password=hashed_pw)
+        hashed_pw = generate_password_hash(form.password.data)
+        new_user = User(username=form.username.data, password=hashed_pw)
         db.session.add(new_user)
         db.session.commit()
         flash('Registration successful. Please log in.')
-        return redirect(url_for('auth.login'))
+        return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
 # Displays the login form
@@ -64,7 +47,7 @@ def login():
         if user and form.password.data and check_password_hash(
             user.password,form.password.data):
             login_user(user)
-            return redirect(url_for('auth.home'))
+            return redirect(url_for('home'))
         flash('Invalid username or password.')
     return render_template('home.html', form=form)
 
@@ -73,7 +56,7 @@ def login():
 @login_required
 def dashboard():
     return render_template('home.html', user=current_user)
-
+    
 # Displays the admin page for users with the 'Admin' role
 @auth.route('/admin')
 @login_required
@@ -82,15 +65,10 @@ def admin():
         flash('Access denied.')
         return redirect(url_for('auth.dashboard'))
     return render_template('home.html', user=current_user)
-
+    
 # Logs out the current user and redirects to the homepage
 @auth.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('auth.home'))
-
-app.register_blueprint(auth)
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
-
