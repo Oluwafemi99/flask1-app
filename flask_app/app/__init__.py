@@ -3,7 +3,7 @@ from flask import Flask
 from dotenv import load_dotenv
 from app.auth.routes import auth_bp
 from app.main.routes import main_bp
-from app.extensions import db, login_manager, csrf
+from app.extensions import db, login_manager, csrf, migrate
 
 load_dotenv()
 
@@ -14,6 +14,7 @@ def create_app():
 
     # Initialize extensions with the app
     db.init_app(app)
+    migrate.init_app(app, db)
     login_manager.init_app(app)
 
     # protect against CSRF attacks
