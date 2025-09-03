@@ -1,8 +1,8 @@
 from flask import Flask, Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_user, login_required, logout_user, current_user, LoginManager
 from werkzeug.security import generate_password_hash, check_password_hash
-from .forms import RegisterForm, LoginForm
-from .models import User
+from forms import RegisterForm, LoginForm
+from models import User
 from flask_wtf.csrf import CSRFProtect
 from flask_sqlalchemy import SQLAlchemy
 import os
