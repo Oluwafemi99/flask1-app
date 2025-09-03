@@ -1,31 +1,34 @@
 from flask import Flask, Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_user, login_required, logout_user, current_user, LoginManager
 from werkzeug.security import generate_password_hash, check_password_hash
-from forms import RegisterForm, LoginForm
-from models import db, User
+from .forms import RegisterForm, LoginForm
+from .models import User
 from flask_wtf.csrf import CSRFProtect
 from flask_sqlalchemy import SQLAlchemy
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
+# Initialize sql extensions
+db = SQLAlchemy()
+login_manager = LoginManager()
+csrf = CSRFProtect()
+
 load_dotenv()
 
-# Initialize Flask app
+# Initialize the Flask application
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+
+# Configure the Flask application
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+csrf = CSRFProtect()
 
 # Initialize extensions with the app
 db.init_app(app)
-login_manager = LoginManager()
 login_manager.init_app(app)
-csrf = CSRFProtect()
-csrf.init_app(app)
 
-# Create database tables within application context
-with app.app_context():
-    db.create_all()
+# protect against CSRF attacks
+csrf.init_app(app)
 
 # Set the login view for the login manager
 login_manager.login_view = 'auth.login' # type: ignore
