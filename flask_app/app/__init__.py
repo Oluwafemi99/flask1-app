@@ -1,15 +1,9 @@
 import os
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
-from flask_wtf.csrf import CSRFProtect
 from dotenv import load_dotenv
 from app.auth.routes import auth_bp
 from app.main.routes import main_bp
-
-db = SQLAlchemy()
-login_manager = LoginManager()
-csrf = CSRFProtect()
+from app.extensions import db, login_manager, csrf
 
 load_dotenv()
 
