@@ -26,9 +26,8 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
 
-    from app.models import Users
-
     with app.app_context():
+        from app.models import Users
         db.create_all()
         print("Database created successfully")
         
