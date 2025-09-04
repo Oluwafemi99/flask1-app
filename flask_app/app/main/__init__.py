@@ -8,7 +8,7 @@ main_bp = Blueprint('main', __name__)
 @main_bp.route('/')
 def home():
     return render_template('home.html')
-    
+
 # Displays the dashboard for logged-in users
 @main_bp.route('/dashboard')
 @login_required

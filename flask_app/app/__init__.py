@@ -2,10 +2,11 @@ import os
 from flask import Flask
 from dotenv import load_dotenv
 from app.auth.routes import auth_bp
-from app.main.routes import main_bp
+from app.main import main_bp
 from app.extensions import db, login_manager, csrf, migrate
 
 load_dotenv()
+
 
 def create_app():
     app = Flask(__name__)
@@ -23,6 +24,11 @@ def create_app():
     # Set the login view for the login manager
     login_manager.login_view = 'auth.login' # type: ignore
 
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return Users.query.get(int(user_id))
+
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
 
@@ -30,5 +36,5 @@ def create_app():
         from app.models import Users
         db.create_all()
         print("Database created successfully")
-        
+
     return app

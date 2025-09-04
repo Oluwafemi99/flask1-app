@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Welcome, {{ user.username }} 👋</h2>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">Profile</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ user.username }}</h5>
+                    <p class="card-text">Role: {{ user.role }}</p>
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-light">Logout</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card mb-3">
+                <div class="card-header">Recent Activity</div>
+                <div class="card-body">
+                    <p class="card-text">No recent activity yet. Start exploring!</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Quick Links</div>
+                <div class="card-body">
+                    <a href="{{ url_for('main.home') }}" class="btn btn-outline-primary">Edit Profile</a>
+                    <a href="{{ url_for('main.admin') }}" class="btn btn-outline-secondary">Settings</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
