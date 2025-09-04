@@ -25,13 +25,16 @@ def create_app():
     login_manager.login_view = 'auth.login' # type: ignore
 
 
+    # Load user from the database
     @login_manager.user_loader
     def load_user(user_id):
         return Users.query.get(int(user_id))
 
+    # Register blueprints
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
 
+    # Create the database tables
     with app.app_context():
         from app.models import Users
         db.create_all()
